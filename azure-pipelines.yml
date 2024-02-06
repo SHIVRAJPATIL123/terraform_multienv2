@@ -22,8 +22,8 @@ parameters:
       - Destroy
 
 variables:
-  envName: $[ if(eq(variables['subscription'], 'Dev'), 'Dev', if(eq(variables['subscription'], 'Test'), 'Test', 'Stage')) ]
-  planFlag: $[ if(eq(variables['terraformation'], 'Destroy'), '-destroy', '') ]
+  envName: $[ if(equals(variables['subscription'], 'Dev'), 'Dev', if(equals(variables['subscription'], 'Test'), 'Test', 'Stage')) ]
+  planFlag: $[ if(equals(variables['terraformation'], 'Destroy'), '-destroy', '') ]
   overrideFiles: TF WEB APP/Environments/$(subscription)
 
 steps:
@@ -81,4 +81,4 @@ steps:
     command: 'destroy'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: eq('${{ parameters.terraformation }}', 'Destroy')
+  condition: equals('${{ parameters.terraformation }}', 'Destroy')
