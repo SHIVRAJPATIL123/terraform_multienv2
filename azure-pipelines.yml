@@ -1,4 +1,5 @@
 trigger: none
+
 pool:
   vmImage: windows-latest
 
@@ -25,14 +26,11 @@ variables:
   envNameTest: 'Test'
   envNameStage: 'Stage'
 
-  planCreate: ''
-  planDestroy: '-destroy'
-
   - name: envname
     value: $[ if(eq(parameters['subscription'], 'Dev'), variables.envNameDev, if(eq(parameters['subscription'], 'Test'), variables.envNameTest, variables.envNameStage)) ]
 
   - name: plan
-    value: $[ if(eq(parameters['terraformation'], 'Create'), variables.planCreate, variables.planDestroy) ]
+    value: $[ if(eq(parameters['terraformation'], 'Create'), '', '-destroy') ]
 
   - name: Overridfiles
     value: TF WEB APP/Environments/$(subscription)
