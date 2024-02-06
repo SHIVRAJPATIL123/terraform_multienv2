@@ -46,7 +46,7 @@ steps:
 - task: TerraformInstaller@0
   displayName: "Terraform install"
   inputs: 
-   terraformVersion: '1.7.0 '
+   terraformVersion: '1.7.0'
 
 - task: TerraformTaskV4@4
   displayName: "Terraform init"
@@ -83,4 +83,4 @@ steps:
     command: ${{ lower(parameters.terraformation) }}
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: eq(lower('${{ parameters.terraformation }}'), 'destroy')
+  condition: eq('${{ parameters.terraformation }}', 'Destroy')
