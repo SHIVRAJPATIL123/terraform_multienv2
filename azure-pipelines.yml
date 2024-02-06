@@ -29,9 +29,9 @@ variables:
   - name: envNameStage
     value: 'Stage'
   - name: envName
-    value: $[ if( eq( variables['subscription'], 'Dev' ), variables['envNameDev'], if( eq( variables['subscription'], 'Test' ), variables['envNameTest'], variables['envNameStage'] ) ) ]
+    value: $[ if( equals( variables['subscription'], 'Dev' ), variables['envNameDev'], if( equals( variables['subscription'], 'Test' ), variables['envNameTest'], variables['envNameStage'] ) ) ]
   - name: planFlag
-    value: $[ if( eq( parameters['terraformation'], 'Destroy' ), '-destroy', '' ) ]
+    value: $[ if( equals( parameters['terraformation'], 'Destroy' ), '-destroy', '' ) ]
   - name: overrideFiles
     value: TF WEB APP/Environments/$(subscription)
 
