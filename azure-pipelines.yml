@@ -21,31 +21,27 @@ parameters:
       - Create
       - Destroy
 
-variables:
-  - name: envNameDev
-    value: 'Dev'
-
-  - name: envNameTest
-    value: 'Test'
-
-  - name: envNameStage
-    value: 'Stage'
-
-  - name: envname
-    value: $[ if(eq(parameters['subscription'], 'Dev'), variables.envNameDev, if(eq(parameters['subscription'], 'Test'), variables.envNameTest, variables.envNameStage)) ]
-
-  - name: plan
-    value: $[ if(eq(parameters['terraformation'], 'Create'), '', '-destroy') ]
-
-  - name: Overridfiles
-    value: TF WEB APP/Environments/$(subscription)
-
 stages:
   - stage: Terraform
     jobs:
       - job: Terraform_Job
         displayName: Terraform Job
         steps:
+          - task: PowerShell@2
+            displayName: 'Set Environment Variables'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $subscription = "$(subscription)"
+                if ($subscription -eq "Dev") {
+                  $envName = "Dev"
+                } elseif ($subscription -eq "Test") {
+                  $envName = "Test"
+                } else {
+                  $envName = "Stage"
+                }
+                echo "##vso[task.setvariable variable=envName]$envName"
+
           - task: TerraformInstaller@0
             displayName: "Terraform install"
             inputs: 
