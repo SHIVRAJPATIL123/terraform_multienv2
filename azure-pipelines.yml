@@ -22,9 +22,18 @@ parameters:
       - Destroy
 
 variables:
-  envName: $[ if(equals(variables['subscription'], 'Dev'), 'Dev', if(equals(variables['subscription'], 'Test'), 'Test', 'Stage')) ]
-  planFlag: $[ if(equals(variables['terraformation'], 'Destroy'), '-destroy', '') ]
-  overrideFiles: TF WEB APP/Environments/$(subscription)
+  - name: envNameDev
+    value: 'Dev'
+  - name: envNameTest
+    value: 'Test'
+  - name: envNameStage
+    value: 'Stage'
+  - name: envName
+    value: $[ if( eq( variables['subscription'], 'Dev' ), variables['envNameDev'], if( eq( variables['subscription'], 'Test' ), variables['envNameTest'], variables['envNameStage'] ) ) ]
+  - name: planFlag
+    value: $[ if( eq( parameters['terraformation'], 'Destroy' ), '-destroy', '' ) ]
+  - name: overrideFiles
+    value: TF WEB APP/Environments/$(subscription)
 
 steps:
 - task: PowerShell@2
@@ -81,4 +90,4 @@ steps:
     command: 'destroy'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: equals('${{ parameters.terraformation }}', 'Destroy')
+  condition: eq('${{ parameters.terraformation }}', 'Destroy')
