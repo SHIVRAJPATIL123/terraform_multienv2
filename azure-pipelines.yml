@@ -3,6 +3,7 @@ trigger: none
 pool:
   vmImage: windows-latest
 
+
 parameters:
   - name: subscription
     type: string
@@ -22,32 +23,30 @@ parameters:
       - Destroy
 
 variables:
-  - name: envNameDev
-    value: 'Dev'
-  - name: envNameTest
-    value: 'Test'
-  - name: envNameStage
-    value: 'Stage'
-  - name: envName
-    value: $[ if( equals( variables['subscription'], 'Dev' ), variables['envNameDev'], if( equals( variables['subscription'], 'Test' ), variables['envNameTest'], variables['envNameStage'] ) ) ]
-  - name: planFlag
-    value: $[ if( equals( parameters['terraformation'], 'Destroy' ), '-destroy', '' ) ]
-  - name: overrideFiles
-    value: TF WEB APP/Environments/$(subscription)
+  - name: 'envname'
+    ${{ if eq( parameters['subscription'], 'Dev') }}:
+      value: "Dev"
+    ${{ if eq( parameters['subscription'], 'Test' ) }}:
+      value: "Test"
+    ${{ if eq( parameters['subscription'], 'Stage') }}:
+      value: "Stage"
+
+##Adds destroy flag to plan if selected action is Destroy
+
+  - name: 'plan'
+    ${{ if eq ( parameters['terraformation'], 'Create' ) }}:
+      value: ""
+    ${{ if eq ( parameters['terraformation'], 'Destroy') }}:
+      value: "-destroy" 
+
+  - name: 'Overridfiles'
+    value: TF WEB APP/Environments/${{parameters.subscription}}
 
 steps:
-- task: PowerShell@2
-  displayName: 'Set Environment Variable'
-  inputs:
-    targetType: 'inline'
-    script: |
-      $env:envname = "$(envName)"
-      Write-Host "##vso[task.setvariable variable=envname]$envname"
-
 - task: TerraformInstaller@0
   displayName: "Terraform install"
   inputs: 
-    terraformVersion: '1.7.0'
+   terraformVersion: '1.7.0 '
 
 - task: TerraformTaskV4@4
   displayName: "Terraform init"
@@ -60,8 +59,9 @@ steps:
     backendAzureRmContainerName: 'azuredevopscontainer'
     backendAzureRmKey: 'terraform.tfstate'
   
+    
 - task: TerraformTaskV4@4
-  displayName: "Terraform ${{ parameters.terraformation }} plan"
+  displayName: "Terraform ${{ parameters.terraformation }} plan "
   inputs:
     provider: 'azurerm'
     command: 'plan'
@@ -76,6 +76,7 @@ steps:
     artifactName: 'terraformPlan'
     publishLocation: 'Container'    
 
+
 - task: TerraformTaskV4@4
   displayName: "Terraform apply"
   inputs:
@@ -84,10 +85,11 @@ steps:
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
 - task: TerraformTaskV4@4
+  condition: eq('${{ parameters.terraformation }}', 'Destroy')
   displayName: "Terraform destroy"
   inputs:
     provider: 'azurerm'
     command: 'destroy'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: eq('${{ parameters.terraformation }}', 'Destroy')
+    
