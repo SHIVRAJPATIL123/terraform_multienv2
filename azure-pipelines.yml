@@ -1,11 +1,13 @@
-trigger: none
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - README.md
 
 pool:
   vmImage: windows-latest
-
-branches:
-  include:
-    - refs/heads/master
 
 parameters:
   - name: subscription
