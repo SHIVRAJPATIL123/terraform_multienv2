@@ -3,6 +3,9 @@ trigger: none
 pool:
   vmImage: windows-latest
 
+branches:
+  include:
+    - refs/heads/master
 
 parameters:
   - name: subscription
