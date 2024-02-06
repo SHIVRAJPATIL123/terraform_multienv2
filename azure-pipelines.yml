@@ -22,9 +22,14 @@ parameters:
       - Destroy
 
 variables:
-  envNameDev: 'Dev'
-  envNameTest: 'Test'
-  envNameStage: 'Stage'
+  - name: envNameDev
+    value: 'Dev'
+
+  - name: envNameTest
+    value: 'Test'
+
+  - name: envNameStage
+    value: 'Stage'
 
   - name: envname
     value: $[ if(eq(parameters['subscription'], 'Dev'), variables.envNameDev, if(eq(parameters['subscription'], 'Test'), variables.envNameTest, variables.envNameStage)) ]
