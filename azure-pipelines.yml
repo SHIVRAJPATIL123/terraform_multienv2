@@ -27,7 +27,7 @@ variables:
 
 ##Adds destroy flag to plan if selected action is Destroy
   - name: 'plan'
-    value: ${{ if eq(parameters['terraformation'], 'Create') }}${{ else }}-destroy${{ endif }}
+    value: ${{ if eq(parameters['terraformation'], 'Create') }}Create${{ else }}-destroy${{ endif }}
 
   - name: 'Overridfiles'
     value: 'TF WEB APP/Environments/${{ parameters.subscription }}'
