@@ -23,13 +23,13 @@ parameters:
 
 variables:
   - name: 'envname'
-    value: ${{ if eq(parameters['subscription'], 'Dev') }}Dev${{ elseif eq(parameters['subscription'], 'Test') }}Test${{ else }}Stage${{ endif }}
+    value: $[ if(eq(parameters['subscription'], 'Dev'), 'Dev', if(eq(parameters['subscription'], 'Test'), 'Test', 'Stage')) ]
 
   - name: 'plan'
-    value: ${{ if eq(parameters['terraformation'], 'Destroy') }}-destroy${{ else }}${{ endif }}
+    value: $[ if(eq(parameters['terraformation'], 'Destroy'), '-destroy', '') ]
 
   - name: 'Overridfiles'
-    value: TF WEB APP/Environments/${{ parameters.subscription }}
+    value: TF WEB APP/Environments/$(subscription)
 
 steps:
 - task: TerraformInstaller@0
