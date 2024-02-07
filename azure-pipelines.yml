@@ -13,7 +13,6 @@ parameters:
       - Test
       - Stage
   
-
   - name: terraformaction
     type: string
     displayName: 'terraformaction'
@@ -22,13 +21,10 @@ parameters:
       - Create  
       - Destroy
 
-- name: Plan
+  - name: Plan
     type: string
     displayName: 'Plan'
     default: 'Create'
-
-variables:
-  defaultPlan: ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy' ${{ else }} ''
 
 steps:
   - task: TerraformInstaller@0
@@ -79,7 +75,9 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: "-out=terraform.tfplan -var-file=$(config_file_path)"
+      commandOptions: |
+        -out=terraform.tfplan
+        -var-file=$(config_file_path)
       environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
   - task: PublishBuildArtifacts@1
@@ -92,7 +90,7 @@ steps:
   - task: TerraformTaskV4@4
     displayName: "Terraform apply"
     condition: |
-      and(succeeded(), eq(variables['terraformaction'], 'Create'))
+      and(succeeded(), eq(parameters['terraformaction'], 'Create'))
     inputs:
       provider: 'azurerm'
       command: 'apply'
@@ -102,9 +100,8 @@ steps:
   - task: TerraformTaskV4@4
     displayName: "Terraform destroy"
     condition: |
-      and(succeeded(), eq(variables['terraformaction'], 'Destroy'))
+      and(succeeded(), eq(parameters['terraformaction'], 'Destroy'))
     inputs:
       provider: 'azurerm'
       command: 'destroy'
       environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-
