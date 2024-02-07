@@ -26,7 +26,7 @@ parameters:
   - name: Plan
     type: string
     displayName: 'Plan'
-    default: ${{ if eq(parameters['terraformaction'], 'Create') }} ''
+    default: 'Create'
     values: 
       - ${{ if eq(parameters['terraformaction'], 'Create') }} ''
       - ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy'
