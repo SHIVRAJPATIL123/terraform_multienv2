@@ -21,11 +21,21 @@ steps:
 
   - script: |
       if [ "$(subscription)" == "Dev" ]; then
-        config_file_path="$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars"
+        cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
       elif [ "$(subscription)" == "Test" ]; then
-        config_file_path="$(Build.SourcesDirectory)/Environments/Test.auto.tfvars"
+        cp "$(Build.SourcesDirectory)/Environments/Test.auto.tfvars" "$(Build.SourcesDirectory)/"
       else
-        config_file_path="$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars"
+        cp "$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars" "$(Build.SourcesDirectory)/"
+      fi
+    displayName: 'Copy .auto.tfvars file'
+
+  - script: |
+      if [ "$(subscription)" == "Dev" ]; then
+        config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
+      elif [ "$(subscription)" == "Test" ]; then
+        config_file_path="$(Build.SourcesDirectory)/Test.auto.tfvars"
+      else
+        config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
       fi
       echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
     displayName: 'Set config_file_path variable'
