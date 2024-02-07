@@ -21,9 +21,9 @@ parameters:
       - Create  
       - Destroy
 
-variables:
-  - name: Plan
-    value: ${{ if(eq(parameters['terraformaction'], 'Create'), 'Create', 'Destroy') }}
+# variables:
+#   - name: Plan
+#     value: ${{ if(eq(parameters['terraformaction'], 'Create'), 'Create', 'Destroy') }}
 
  steps:
    - task: TerraformInstaller@0
