@@ -22,10 +22,13 @@ parameters:
       - Create  
       - Destroy
 
-  - name: Plan
+- name: Plan
     type: string
     displayName: 'Plan'
-    default: ${{ if eq(parameters['terraformaction'], 'Create') }} '' ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy'
+    default: ''
+
+variables:
+  defaultPlan: ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy' ${{ else }} ''
 
 steps:
   - task: TerraformInstaller@0
