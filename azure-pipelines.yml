@@ -86,7 +86,7 @@ steps:
     command: 'apply'
     commandOptions: "-var-file=$(config_file_path)"
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: eq(parameters['terraformaction'], 'Create')
+  condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Create'))
 
 - task: TerraformTaskV4@4
   displayName: "Terraform destroy"
@@ -94,4 +94,4 @@ steps:
     provider: 'azurerm'
     command: 'destroy'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  condition: eq(parameters['terraformaction'], 'Destroy')
+  condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Destroy'))
