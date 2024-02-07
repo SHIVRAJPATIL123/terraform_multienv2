@@ -14,9 +14,9 @@ parameters:
       - Stage
 
 variables:
-  library_variable_id: ${{ if eq(parameters['subscription'], 'Dev') }}1${{ if eq(parameters['subscription'], 'Test') }}2${{ if eq(parameters['subscription'], 'Stage') }}3
-
-  envname: ${{ if eq(parameters['subscription'], 'Dev') }}Dev${{ if eq(parameters['subscription'], 'Test') }}Test${{ if eq(parameters['subscription'], 'Stage') }}Stage
+  library_variable_id: $[ if(eq(parameters['subscription'], 'Dev'), '1', if(eq(parameters['subscription'], 'Test'), '2', '3')) ]
+  
+  envname: $[ if(eq(parameters['subscription'], 'Dev'), 'Dev', if(eq(parameters['subscription'], 'Test'), 'Test', 'Stage')) ]
 
 steps:
   - task: TerraformInstaller@0
