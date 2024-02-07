@@ -26,7 +26,7 @@ variables:
     ${{ if eq( parameters['terraformaction'], 'Create')}}:
       value: ""
     ${{ if eq( parameters['terraformaction'], 'Destroy')}}:
-      value: "-destroy"  
+      value: "-destroy"
 
 
 steps:
