@@ -1,3 +1,6 @@
+
+
+User
 trigger: none
 
 pool:
@@ -26,15 +29,17 @@ parameters:
     displayName: 'Plan'
     default: 'Create'
     values: |
-      Create: ''
-      Destroy: '-destroy'
+      ${{ if eq(parameters['terraformaction'], 'Create') }}:
+      value: - ''
+      ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
+      value:'-destroy'
  
-steps:
-  - task: TerraformInstaller@0
-    displayName: "Terraform install"
-    inputs: 
-      terraformVersion: '1.7.0'
-
+ steps:
+   - task: TerraformInstaller@0
+     displayName: "Terraform install"
+     inputs: 
+       terraformVersion: '1.7.0'
+ 
   - script: |
       if [ "${{ parameters.subscription }}" == "Dev" ]; then
         cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
@@ -61,6 +66,7 @@ steps:
     inputs:
       script: 'echo "$(config_file_path)"'
 
+  
   - task: TerraformTaskV4@4
     displayName: "Terraform init"
     inputs:
