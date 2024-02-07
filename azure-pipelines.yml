@@ -49,8 +49,8 @@ steps:
       backend_key="terraform_stage.tfstate"
     fi
     echo "Config File Path: $config_file_path"
-    echo "vso[task.setvariable variable=config_file_path]$config_file_path"
-    echo "vso[task.setvariable variable=backend_key]$backend_key"
+    echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
+    echo "##vso[task.setvariable variable=backend_key]$backend_key"
   displayName: 'Set config_file_path and backend_key variables'
 
 - task: CmdLine@2
