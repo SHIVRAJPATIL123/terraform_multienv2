@@ -13,15 +13,15 @@ parameters:
       - Test
       - Stage
 
-variables:
-  - name: config_file_path
-    value: $(Build.SourcesDirectory)/Environments/$(parameters.subscription).auto.tfvars
-
 steps:
   - task: TerraformInstaller@0
     displayName: "Terraform install"
     inputs: 
       terraformVersion: '1.7.0'
+
+  - script: |
+      echo "##vso[task.setvariable variable=config_file_path]$(Build.SourcesDirectory)/Environments/$(parameters.subscription).auto.tfvars"
+    displayName: 'Set config_file_path variable'
 
   - task: TerraformTaskV4@4
     displayName: "Terraform init"
@@ -34,13 +34,9 @@ steps:
       backendAzureRmContainerName: 'azuredevopscontainer'
       backendAzureRmKey: 'terraform.tfstate'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform plan"
-    inputs:
-      provider: 'azurerm'
-      command: 'plan'
-      commandOptions: "-var-file=$(config_file_path)"
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  - script: |
+      /opt/hostedtoolcache/terraform/1.7.0/x64/terraform plan -var-file=$(config_file_path) -detailed-exitcode
+    displayName: 'Terraform plan'
 
   - task: PublishBuildArtifacts@1
     displayName: "publish build artifacts"
