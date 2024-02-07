@@ -12,6 +12,22 @@ parameters:
       - Dev
       - Test
       - Stage
+  
+  - name: terraformaction
+    type: string
+    displayName: 'terraformaction'
+    default: 'Create'
+    values:
+      - Create  
+      - Destroy
+
+variables:
+ - name: 'Plan'
+    ${{ if eq( parameters['terraformaction'], 'Create')}}:
+      value: ""
+    ${{ if eq( parameters['terraformaction'], 'Destroy')}}:
+      value: "-destroy"  
+
 
 steps:
   - task: TerraformInstaller@0
@@ -45,7 +61,7 @@ steps:
     inputs:
       script: 'echo "$(config_file_path)"'
 
-
+  
   - task: TerraformTaskV4@4
     displayName: "Terraform init"
     inputs:
@@ -74,8 +90,17 @@ steps:
 
   - task: TerraformTaskV4@4
     displayName: "Terraform apply"
+    condition: and(succeeded(), eq('${{ parameters.TerraformAction}}', 'Create'))
     inputs:
       provider: 'azurerm'
       command: 'apply'
       commandOptions: "-var-file=$(config_file_path)"
       environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+
+- task: TerraformTaskV4@4
+  displayName: "Terraform destroy"
+  condition: and(succeeded(), eq('${{ parameters.TerraformAction}}', 'Destroy'))
+  inputs:
+    provider: 'azurerm'
+    command: 'destroy'
+    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
