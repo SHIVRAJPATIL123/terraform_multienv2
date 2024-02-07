@@ -20,14 +20,14 @@ steps:
       terraformVersion: '1.7.0'
 
   - script: |
-      if [ "$(subscription)" == "Dev" ]; then
+      if [ "$subscription" == "Dev" ]; then
         config_file_path="$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars"
-      elif [ "$(subscription)" == "Test" ]; then
+      elif [ "$subscription" == "Test" ]; then
         config_file_path="$(Build.SourcesDirectory)/Environments/Test.auto.tfvars"
       else
         config_file_path="$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars"
       fi
-      echo "vso[task.setvariable variable=config_file_path]$config_file_path"
+      echo "#vso[task.setvariable variable=config_file_path]$config_file_path"
     displayName: 'Set config_file_path variable'
 
   - task: TerraformTaskV4@4
