@@ -40,18 +40,24 @@ steps:
 - script: |
     if [ "${{ parameters.subscription }}" == "Dev" ]; then
       config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
+      backend_key="terraform_dev.tfstate"
     elif [ "${{ parameters.subscription }}" == "Test" ]; then
       config_file_path="$(Build.SourcesDirectory)/Test.auto.tfvars"
+      backend_key="terraform_test.tfstate"
     else
       config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
+      backend_key="terraform_stage.tfstate"
     fi
     echo "Config File Path: $config_file_path"
-    echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
-  displayName: 'Set config_file_path variable'
+    echo "vso[task.setvariable variable=config_file_path]$config_file_path"
+    echo "vso[task.setvariable variable=backend_key]$backend_key"
+  displayName: 'Set config_file_path and backend_key variables'
 
 - task: CmdLine@2
   inputs:
-    script: 'echo "$(config_file_path)"'
+    script: |
+      echo "$(config_file_path)"
+      echo "$(backend_key)"
 
 - task: TerraformTaskV4@4
   displayName: "Terraform init"
@@ -62,7 +68,7 @@ steps:
     backendAzureRmResourceGroupName: 'azuredevops'
     backendAzureRmStorageAccountName: 'azuredevops4544'
     backendAzureRmContainerName: 'azuredevopscontainer'
-    backendAzureRmKey: 'terraform.tfstate'
+    backendAzureRmKey: '$(backend_key)'
 
 - task: TerraformTaskV4@4
   displayName: "Terraform plan"
