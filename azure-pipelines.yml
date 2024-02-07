@@ -23,10 +23,12 @@ parameters:
 
 variables:
   - name: Plan
-    ${{ if eq(parameters['terraformaction'], 'Create') }}:
-      value: 'Create'
-    ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
-      value: 'Destroy'
+    value: |
+      ${{ if eq(parameters['terraformaction'], 'Create') }}:
+        Create
+      ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
+        Destroy
+
 
 
  
