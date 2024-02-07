@@ -13,6 +13,7 @@ parameters:
       - Test
       - Stage
   
+parameters:
   - name: terraformaction
     type: string
     displayName: 'terraformaction'
@@ -22,11 +23,12 @@ parameters:
       - Destroy
 
   - name: Plan
-    ${{ if eq(parameters['terraformaction'], 'Create') }}:
-      value: ""
+    type: string
+    displayName: 'Plan'
+    default: ${{ if eq(parameters['terraformaction'], 'Create') }}:
+      ''
     ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
-      value: "-destroy"
-  
+      '-destroy'
 
 steps:
   - task: TerraformInstaller@0
