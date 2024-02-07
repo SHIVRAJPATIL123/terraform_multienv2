@@ -30,11 +30,10 @@ parameters:
       # Add more variable group names as needed
 
 steps:
-- ${{ each group in parameters.terraformVarsGroup }}:
-  - task: TerraformInstaller@0
-    displayName: "Terraform install"
-    inputs: 
-     terraformVersion: '$(terraformVarsGroup.${{ group }}.terraformVersion)'
+- task: TerraformInstaller@0
+  displayName: "Terraform install"
+  inputs: 
+    terraformVersion: '$(terraformVarsGroup.terraformVersion)'
 
 - script: |
     if [ "${{ parameters.subscription }}" == "Dev" ]; then
@@ -73,10 +72,10 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    backendServiceArm: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
-    backendAzureRmResourceGroupName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmResourceGroupName)'
-    backendAzureRmStorageAccountName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmStorageAccountName)'
-    backendAzureRmContainerName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmContainerName)'
+    backendServiceArm: '$(terraformVarsGroup.backendServiceArm)'
+    backendAzureRmResourceGroupName: '$(terraformVarsGroup.backendAzureRmResourceGroupName)'
+    backendAzureRmStorageAccountName: '$(terraformVarsGroup.backendAzureRmStorageAccountName)'
+    backendAzureRmContainerName: '$(terraformVarsGroup.backendAzureRmContainerName)'
     backendAzureRmKey: '$(backend_key)'
 
 - task: TerraformTaskV4@4
@@ -85,7 +84,7 @@ steps:
     provider: 'azurerm'
     command: 'plan'
     commandOptions: '-out=terraform.tfplan -var-file=$(config_file_path)'
-    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.backendServiceArm)'
 
 - task: PublishBuildArtifacts@1
   displayName: "publish build artifacts"
@@ -100,7 +99,7 @@ steps:
     provider: 'azurerm'
     command: 'apply'
     commandOptions: "-var-file=$(config_file_path)"
-    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Create'))
 
 - task: TerraformTaskV4@4
@@ -108,5 +107,5 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'destroy'
-    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Destroy'))
