@@ -21,10 +21,10 @@ parameters:
       - Create  
       - Destroy
 
-  - name: Plan
-    type: string
-    displayName: 'Plan'
-    default: 'Create'
+  # - name: Plan
+  #   type: string
+  #   displayName: 'Plan'
+  #   default: 'Create'
 
 steps:
   - task: TerraformInstaller@0
@@ -90,7 +90,7 @@ steps:
   - task: TerraformTaskV4@4
     displayName: "Terraform apply"
     condition: |
-      and(succeeded(), eq(parameters['terraformaction'], 'Create'))
+      eq(parameters['terraformaction'], 'Create'))
     inputs:
       provider: 'azurerm'
       command: 'apply'
@@ -100,7 +100,7 @@ steps:
   - task: TerraformTaskV4@4
     displayName: "Terraform destroy"
     condition: |
-      and(succeeded(), eq(parameters['terraformaction'], 'Destroy'))
+      eq(parameters['terraformaction'], 'Destroy'))
     inputs:
       provider: 'azurerm'
       command: 'destroy'
