@@ -22,10 +22,11 @@ parameters:
       - Destroy
 
   - name: Plan
-    value: ${{ if eq(parameters['terraformaction'], 'Create') }}:
-      ''
+    ${{ if eq(parameters['terraformaction'], 'Create') }}:
+      value: ""
     ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
-      '-destroy'
+      value: "-destroy"
+  
 
 steps:
   - task: TerraformInstaller@0
