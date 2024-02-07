@@ -21,84 +21,77 @@ parameters:
       - Create  
       - Destroy
 
-# variables:
-#   - name: Plan
-#     value: ${{ if(eq(parameters['terraformaction'], 'Create'), 'Create', 'Destroy') }}
-
 steps:
 - task: TerraformInstaller@0
   displayName: "Terraform install"
   inputs: 
    terraformVersion: '1.7.0 '
- 
-  - script: |
-      if [ "${{ parameters.subscription }}" == "Dev" ]; then
-        cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
-      elif [ "${{ parameters.subscription }}" == "Test" ]; then
-        cp "$(Build.SourcesDirectory)/Environments/Test.auto.tfvars" "$(Build.SourcesDirectory)/"
-      else
-        cp "$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars" "$(Build.SourcesDirectory)/"
-      fi
-    displayName: 'Copy .auto.tfvars file'
 
-  - script: |
-      if [ "${{ parameters.subscription }}" == "Dev" ]; then
-        config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
-      elif [ "${{ parameters.subscription }}" == "Test" ]; then
-        config_file_path="$(Build.SourcesDirectory)/Test.auto.tfvars"
-      else
-        config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
-      fi
-      echo "Config File Path: $config_file_path"
-      echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
-    displayName: 'Set config_file_path variable'
+- script: |
+    if [ "${{ parameters.subscription }}" == "Dev" ]; then
+      cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
+    elif [ "${{ parameters.subscription }}" == "Test" ]; then
+      cp "$(Build.SourcesDirectory)/Environments/Test.auto.tfvars" "$(Build.SourcesDirectory)/"
+    else
+      cp "$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars" "$(Build.SourcesDirectory)/"
+    fi
+  displayName: 'Copy .auto.tfvars file'
 
-  - task: CmdLine@2
-    inputs:
-      script: 'echo "$(config_file_path)"'
+- script: |
+    if [ "${{ parameters.subscription }}" == "Dev" ]; then
+      config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
+    elif [ "${{ parameters.subscription }}" == "Test" ]; then
+      config_file_path="$(Build.SourcesDirectory)/Test.auto.tfvars"
+    else
+      config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
+    fi
+    echo "Config File Path: $config_file_path"
+    echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
+  displayName: 'Set config_file_path variable'
 
-  
-  - task: TerraformTaskV4@4
-    displayName: "Terraform init"
-    inputs:
-      provider: 'azurerm'
-      command: 'init'
-      backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-      backendAzureRmResourceGroupName: 'azuredevops'
-      backendAzureRmStorageAccountName: 'azuredevops4544'
-      backendAzureRmContainerName: 'azuredevopscontainer'
-      backendAzureRmKey: 'terraform.tfstate'
+- task: CmdLine@2
+  inputs:
+    script: 'echo "$(config_file_path)"'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform plan"
-    inputs:
-      provider: 'azurerm'
-      command: 'plan'
-      commandOptions: '-out=terraform.tfplan -var-file=$(config_file_path)'
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+- task: TerraformTaskV4@4
+  displayName: "Terraform init"
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+    backendAzureRmResourceGroupName: 'azuredevops'
+    backendAzureRmStorageAccountName: 'azuredevops4544'
+    backendAzureRmContainerName: 'azuredevopscontainer'
+    backendAzureRmKey: 'terraform.tfstate'
 
-  - task: PublishBuildArtifacts@1
-    displayName: "publish build artifacts"
-    inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/terraform.tfplan'
-      artifactName: 'terraformPlan'
-      publishLocation: 'Container'
+- task: TerraformTaskV4@4
+  displayName: "Terraform plan"
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    commandOptions: '-out=terraform.tfplan -var-file=$(config_file_path)'
+    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
-  # Terraform apply task
-  - task: TerraformTaskV4@4
-    displayName: "Terraform apply"
-    inputs:
-      provider: 'azurerm'
-      command: 'apply'
-      commandOptions: "-var-file=$(config_file_path)"
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-    condition: eq(parameters['terraformaction'], 'Create')
-  
-  # Terraform destroy task
-  - task: TerraformTaskV4@4
-    displayName: "Terraform destroy"
-    inputs:
-      provider: 'azurerm'
-      command: 'destroy'
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-    condition: eq(parameters['terraformaction'], 'Destroy')
+- task: PublishBuildArtifacts@1
+  displayName: "publish build artifacts"
+  inputs:
+    pathtoPublish: '$(System.DefaultWorkingDirectory)/terraform.tfplan'
+    artifactName: 'terraformPlan'
+    publishLocation: 'Container'
+
+- task: TerraformTaskV4@4
+  displayName: "Terraform apply"
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    commandOptions: "-var-file=$(config_file_path)"
+    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  condition: eq(variables['terraformaction'], 'Create')
+
+- task: TerraformTaskV4@4
+  displayName: "Terraform destroy"
+  inputs:
+    provider: 'azurerm'
+    command: 'destroy'
+    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  condition: eq(variables['terraformaction'], 'Destroy')
