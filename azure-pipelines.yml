@@ -21,10 +21,10 @@ parameters:
       - Create  
       - Destroy
 
-  # - name: Plan
-  #   type: string
-  #   displayName: 'Plan'
-  #   default: 'Create'
+  - name: Plan
+    type: string
+    displayName: 'Plan'
+    default: 'Create'
 
 steps:
   - task: TerraformInstaller@0
@@ -90,18 +90,18 @@ steps:
   - task: TerraformTaskV4@4
     displayName: "Terraform apply"
     condition: |
-      eq(parameters['terraformaction'], 'Create'))
+      and(succeeded(), eq(parameters['terraformaction'], 'Create'))
     inputs:
       provider: 'azurerm'
       command: 'apply'
       commandOptions: "-var-file=$(config_file_path)"
       environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform destroy"
-    condition: |
-      eq(parameters['terraformaction'], 'Destroy'))
-    inputs:
-      provider: 'azurerm'
-      command: 'destroy'
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+- task: TerraformTaskV4@4
+  displayName: "Terraform destroy"
+  inputs:
+    provider: 'azurerm'
+    command: 'destroy'
+    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  condition: |
+    eq(parameters['terraformaction'], 'Destroy')
