@@ -21,24 +21,22 @@ parameters:
       - Create  
       - Destroy
 
-
-
   - name: Plan
     type: string
     displayName: 'Plan'
     default: 'Create'
-    values: 
-      - ${{ if eq(parameters['terraformaction'], 'Create') }} ''
-      - ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy'
-
-
-
-steps:
-  - task: TerraformInstaller@0
-    displayName: "Terraform install"
-    inputs: 
-      terraformVersion: '1.7.0'
-
+    values: |
+      ${{ if eq(parameters['terraformaction'], 'Create') }}:
+      value: - ''
+      ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
+      value:'-destroy'
+ 
+ steps:
+   - task: TerraformInstaller@0
+     displayName: "Terraform install"
+     inputs: 
+       terraformVersion: '1.7.0'
+ 
   - script: |
       if [ "${{ parameters.subscription }}" == "Dev" ]; then
         cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
