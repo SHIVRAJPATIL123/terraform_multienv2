@@ -3,6 +3,13 @@ trigger: none
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  terraformVersion: '1.7.0'
+  backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  backendAzureRmResourceGroupName: 'azuredevops'
+  backendAzureRmStorageAccountName: 'azuredevops4544'
+  backendAzureRmContainerName: 'azuredevopscontainer'
+
 parameters:
   - name: subscription
     type: string
@@ -25,7 +32,7 @@ steps:
 - task: TerraformInstaller@0
   displayName: "Terraform install"
   inputs: 
-   terraformVersion: '1.7.0 '
+   terraformVersion: '$(terraformVersion)'
 
 - script: |
     if [ "${{ parameters.subscription }}" == "Dev" ]; then
@@ -64,10 +71,10 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-    backendAzureRmResourceGroupName: 'azuredevops'
-    backendAzureRmStorageAccountName: 'azuredevops4544'
-    backendAzureRmContainerName: 'azuredevopscontainer'
+    backendServiceArm: '$(backendServiceArm)'
+    backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
+    backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
+    backendAzureRmContainerName: '$(backendAzureRmContainerName)'
     backendAzureRmKey: '$(backend_key)'
 
 - task: TerraformTaskV4@4
@@ -76,7 +83,7 @@ steps:
     provider: 'azurerm'
     command: 'plan'
     commandOptions: '-out=terraform.tfplan -var-file=$(config_file_path)'
-    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+    environmentServiceNameAzureRM: '$(backendServiceArm)'
 
 - task: PublishBuildArtifacts@1
   displayName: "publish build artifacts"
@@ -91,7 +98,7 @@ steps:
     provider: 'azurerm'
     command: 'apply'
     commandOptions: "-var-file=$(config_file_path)"
-    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+    environmentServiceNameAzureRM: '$(backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Create'))
 
 - task: TerraformTaskV4@4
@@ -99,5 +106,5 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'destroy'
-    environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+    environmentServiceNameAzureRM: '$(backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Destroy'))
