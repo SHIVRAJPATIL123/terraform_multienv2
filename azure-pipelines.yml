@@ -29,6 +29,7 @@ steps:
       fi
     displayName: 'Copy .auto.tfvars file'
 
+
   - script: |
       if [ "$(subscription)" == "Dev" ]; then
         config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
@@ -37,39 +38,44 @@ steps:
       else
         config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
       fi
-      echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
+      echo "vso[task.setvariable variable=config_file_path]$config_file_path"
     displayName: 'Set config_file_path variable'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform init"
-    inputs:
-      provider: 'azurerm'
-      command: 'init'
-      backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-      backendAzureRmResourceGroupName: 'azuredevops'
-      backendAzureRmStorageAccountName: 'azuredevops4544'
-      backendAzureRmContainerName: 'azuredevopscontainer'
-      backendAzureRmKey: 'terraform.tfstate'
+# - task: CmdLine@2
+#   inputs:
+#     script: 'echo "$(config_file_path)'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform plan"
-    inputs:
-      provider: 'azurerm'
-      command: 'plan'
-      commandOptions: "-out=terraform.tfplan -var-file=$(config_file_path)"
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
-  - task: PublishBuildArtifacts@1
-    displayName: "publish build artifacts"
-    inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/terraform.tfplan'
-      artifactName: 'terraformPlan'
-      publishLocation: 'Container'
+  # - task: TerraformTaskV4@4
+  #   displayName: "Terraform init"
+  #   inputs:
+  #     provider: 'azurerm'
+  #     command: 'init'
+  #     backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  #     backendAzureRmResourceGroupName: 'azuredevops'
+  #     backendAzureRmStorageAccountName: 'azuredevops4544'
+  #     backendAzureRmContainerName: 'azuredevopscontainer'
+  #     backendAzureRmKey: 'terraform.tfstate'
 
-  - task: TerraformTaskV4@4
-    displayName: "Terraform apply"
-    inputs:
-      provider: 'azurerm'
-      command: 'apply'
-      commandOptions: "-var-file=$(config_file_path)"
-      environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+  # - task: TerraformTaskV4@4
+  #   displayName: "Terraform plan"
+  #   inputs:
+  #     provider: 'azurerm'
+  #     command: 'plan'
+  #     commandOptions: "-out=terraform.tfplan -var-file=$(config_file_path)"
+  #     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
+
+  # - task: PublishBuildArtifacts@1
+  #   displayName: "publish build artifacts"
+  #   inputs:
+  #     pathtoPublish: '$(System.DefaultWorkingDirectory)/terraform.tfplan'
+  #     artifactName: 'terraformPlan'
+  #     publishLocation: 'Container'
+
+  # - task: TerraformTaskV4@4
+  #   displayName: "Terraform apply"
+  #   inputs:
+  #     provider: 'azurerm'
+  #     command: 'apply'
+  #     commandOptions: "-var-file=$(config_file_path)"
+  #     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
