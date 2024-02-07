@@ -46,7 +46,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: "-var-file=$(config_file_path)"
+      commandOptions: "-out=terraform.tfplan -var-file=$(config_file_path)"
       environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
 
   - task: PublishBuildArtifacts@1
