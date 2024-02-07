@@ -4,11 +4,11 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  terraformVersion: '1.7.0'
-  backendServiceArm: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
-  backendAzureRmResourceGroupName: 'azuredevops'
-  backendAzureRmStorageAccountName: 'azuredevops4544'
-  backendAzureRmContainerName: 'azuredevopscontainer'
+  terraformVersion: ${{ library.TerraformVars.terraformVersion }}
+  backendServiceArm: ${{ library.TerraformVars.backendServiceArm }}
+  backendAzureRmResourceGroupName: ${{ library.TerraformVars.backendAzureRmResourceGroupName }}
+  backendAzureRmStorageAccountName: ${{ library.TerraformVars.backendAzureRmStorageAccountName }}
+  backendAzureRmContainerName: ${{ library.TerraformVars.backendAzureRmContainerName }}
 
 parameters:
   - name: subscription
