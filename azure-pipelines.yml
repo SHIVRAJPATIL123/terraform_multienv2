@@ -4,6 +4,23 @@ pool:
   vmImage: ubuntu-latest
 
 parameters:
+  - name: subscription
+    type: string
+    displayName: 'Environment Name'
+    default: 'Dev'
+    values:
+      - Dev
+      - Test
+      - Stage
+  
+  - name: terraformaction
+    type: string
+    displayName: 'terraformaction'
+    default: 'Create'
+    values:
+      - Create  
+      - Destroy
+      
   - name: terraformVarsGroup
     type: string
     displayName: 'Select Terraform Variable Group'
