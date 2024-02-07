@@ -25,11 +25,11 @@ parameters:
 #   - name: Plan
 #     value: ${{ if(eq(parameters['terraformaction'], 'Create'), 'Create', 'Destroy') }}
 
- steps:
-   - task: TerraformInstaller@0
-     displayName: "Terraform install"
-     inputs: 
-       terraformVersion: '1.7.0'
+steps:
+- task: TerraformInstaller@0
+  displayName: "Terraform install"
+  inputs: 
+   terraformVersion: '1.7.0 '
  
   - script: |
       if [ "${{ parameters.subscription }}" == "Dev" ]; then
