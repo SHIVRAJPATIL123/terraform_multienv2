@@ -14,9 +14,11 @@ parameters:
       - Stage
 
 variables:
-  library_variable_id: $[ if(eq(parameters['subscription'], 'Dev'), '1', if(eq(parameters['subscription'], 'Test'), '2', '3')) ]
-  
-  envname: $[ if(eq(parameters['subscription'], 'Dev'), 'Dev', if(eq(parameters['subscription'], 'Test'), 'Test', 'Stage')) ]
+  - name: library_variable_id
+    value: $(if [ "$(subscription)" -eq "Dev" ] { echo "1" } elseif [ "$(subscription)" -eq "Test" ] { echo "2" } else { echo "3" })
+
+  - name: envname
+    value: $(if [ "$(subscription)" -eq "Dev" ] { echo "Dev" } elseif [ "$(subscription)" -eq "Test" ] { echo "Test" } else { echo "Stage" })
 
 steps:
   - task: TerraformInstaller@0
