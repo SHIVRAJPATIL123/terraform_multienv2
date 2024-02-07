@@ -89,7 +89,7 @@ steps:
 
   - task: TerraformTaskV4@4
     displayName: "Terraform apply"
-    condition: and(succeeded(), ne(variables['terraformaction'], 'Destroy'))
+    condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Create'))
     inputs:
       provider: 'azurerm'
       command: 'apply'
@@ -98,7 +98,7 @@ steps:
 
   - task: TerraformTaskV4@4
     displayName: "Terraform destroy"
-    condition: and(succeeded(), eq(variables['terraformaction'], 'Destroy'))
+    condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Destroy'))
     inputs:
       provider: 'azurerm'
       command: 'destroy'
