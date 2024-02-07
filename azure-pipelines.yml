@@ -3,36 +3,21 @@ trigger: none
 pool:
   vmImage: ubuntu-latest
 
-variables:
-  terraformVersion: ${{ library.TerraformVars.terraformVersion }}
-  backendServiceArm: ${{ library.TerraformVars.backendServiceArm }}
-  backendAzureRmResourceGroupName: ${{ library.TerraformVars.backendAzureRmResourceGroupName }}
-  backendAzureRmStorageAccountName: ${{ library.TerraformVars.backendAzureRmStorageAccountName }}
-  backendAzureRmContainerName: ${{ library.TerraformVars.backendAzureRmContainerName }}
-
 parameters:
-  - name: subscription
+  - name: terraformVarsGroup
     type: string
-    displayName: 'Environment Name'
-    default: 'Dev'
+    displayName: 'Select Terraform Variable Group'
+    default: 'TerraformVars'
     values:
-      - Dev
-      - Test
-      - Stage
-  
-  - name: terraformaction
-    type: string
-    displayName: 'terraformaction'
-    default: 'Create'
-    values:
-      - Create  
-      - Destroy
+      - TerraformVars
+      # Add more variable group names as needed
 
 steps:
-- task: TerraformInstaller@0
-  displayName: "Terraform install"
-  inputs: 
-   terraformVersion: '$(terraformVersion)'
+- ${{ each group in parameters.terraformVarsGroup }}:
+  - task: TerraformInstaller@0
+    displayName: "Terraform install"
+    inputs: 
+     terraformVersion: '$(terraformVarsGroup.${{ group }}.terraformVersion)'
 
 - script: |
     if [ "${{ parameters.subscription }}" == "Dev" ]; then
@@ -71,10 +56,10 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'init'
-    backendServiceArm: '$(backendServiceArm)'
-    backendAzureRmResourceGroupName: '$(backendAzureRmResourceGroupName)'
-    backendAzureRmStorageAccountName: '$(backendAzureRmStorageAccountName)'
-    backendAzureRmContainerName: '$(backendAzureRmContainerName)'
+    backendServiceArm: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
+    backendAzureRmResourceGroupName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmResourceGroupName)'
+    backendAzureRmStorageAccountName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmStorageAccountName)'
+    backendAzureRmContainerName: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendAzureRmContainerName)'
     backendAzureRmKey: '$(backend_key)'
 
 - task: TerraformTaskV4@4
@@ -83,7 +68,7 @@ steps:
     provider: 'azurerm'
     command: 'plan'
     commandOptions: '-out=terraform.tfplan -var-file=$(config_file_path)'
-    environmentServiceNameAzureRM: '$(backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
 
 - task: PublishBuildArtifacts@1
   displayName: "publish build artifacts"
@@ -98,7 +83,7 @@ steps:
     provider: 'azurerm'
     command: 'apply'
     commandOptions: "-var-file=$(config_file_path)"
-    environmentServiceNameAzureRM: '$(backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Create'))
 
 - task: TerraformTaskV4@4
@@ -106,5 +91,5 @@ steps:
   inputs:
     provider: 'azurerm'
     command: 'destroy'
-    environmentServiceNameAzureRM: '$(backendServiceArm)'
+    environmentServiceNameAzureRM: '$(terraformVarsGroup.${{ parameters.terraformVarsGroup }}.backendServiceArm)'
   condition: and(succeeded(), eq('${{ parameters.terraformaction }}', 'Destroy'))
