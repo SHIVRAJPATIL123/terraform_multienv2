@@ -22,8 +22,6 @@ parameters:
       - Create  
       - Destroy
 
-
-
   - name: Plan
     type: string
     displayName: 'Plan'
