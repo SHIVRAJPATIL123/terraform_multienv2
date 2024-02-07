@@ -20,7 +20,7 @@ parameters:
     values:
       - Create  
       - Destroy
-      
+
 variables:
   - name: Plan
     type: string
