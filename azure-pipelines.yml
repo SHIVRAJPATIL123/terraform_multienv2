@@ -87,6 +87,7 @@ steps:
       artifactName: 'terraformPlan'
       publishLocation: 'Container'
 
+# Terraform apply task
 - task: TerraformTaskV4@4
   displayName: "Terraform apply"
   inputs:
@@ -95,8 +96,9 @@ steps:
     commandOptions: "-var-file=$(config_file_path)"
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
   condition: |
-    and(succeeded(), eq(variables['terraformaction'], 'Create'))
-  
+    eq(parameters['terraformaction'], 'Create')
+
+# Terraform destroy task
 - task: TerraformTaskV4@4
   displayName: "Terraform destroy"
   inputs:
@@ -104,4 +106,4 @@ steps:
     command: 'destroy'
     environmentServiceNameAzureRM: 'Pay-As-You-Go(1)(f510d486-a17f-44f2-a1c4-63a7186e923c)'
   condition: |
-    eq(variables['terraformaction'], 'Destroy')
+    eq(parameters['terraformaction'], 'Destroy')
