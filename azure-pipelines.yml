@@ -22,13 +22,15 @@ parameters:
       - Destroy
 
 
+
   - name: Plan
     type: string
     displayName: 'Plan'
-    ${{ if eq(parameters['terraformaction'], 'Create') }}:
-      value: ''
-    ${{ if eq(parameters['terraformaction'], 'Destroy') }}:
-      value: '-destroy'
+    default: ${{ if eq(parameters['terraformaction'], 'Create') }} ''
+    values: 
+      - ${{ if eq(parameters['terraformaction'], 'Create') }} ''
+      - ${{ if eq(parameters['terraformaction'], 'Destroy') }} '-destroy'
+
 
 
 steps:
