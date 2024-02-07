@@ -20,30 +20,30 @@ steps:
       terraformVersion: '1.7.0'
 
   - script: |
-      if [ "$(subscription)" == "Dev" ]; then
+      if [ "${{ parameters.subscription }}" == "Dev" ]; then
         cp "$(Build.SourcesDirectory)/Environments/Dev.auto.tfvars" "$(Build.SourcesDirectory)/"
-      elif [ "$(subscription)" == "Test" ]; then
+      elif [ "${{ parameters.subscription }}" == "Test" ]; then
         cp "$(Build.SourcesDirectory)/Environments/Test.auto.tfvars" "$(Build.SourcesDirectory)/"
       else
         cp "$(Build.SourcesDirectory)/Environments/Stage.auto.tfvars" "$(Build.SourcesDirectory)/"
       fi
     displayName: 'Copy .auto.tfvars file'
 
-
   - script: |
-      if [ "$(subscription)" == "Dev" ]; then
+      if [ "${{ parameters.subscription }}" == "Dev" ]; then
         config_file_path="$(Build.SourcesDirectory)/Dev.auto.tfvars"
-      elif [ "$(subscription)" == "Test" ]; then
+      elif [ "${{ parameters.subscription }}" == "Test" ]; then
         config_file_path="$(Build.SourcesDirectory)/Test.auto.tfvars"
       else
         config_file_path="$(Build.SourcesDirectory)/Stage.auto.tfvars"
       fi
-      echo "vso[task.setvariable variable=config_file_path]$config_file_path"
+      echo "Config File Path: $config_file_path"
+      echo "##vso[task.setvariable variable=config_file_path]$config_file_path"
     displayName: 'Set config_file_path variable'
 
-# - task: CmdLine@2
-#   inputs:
-#     script: 'echo "$(config_file_path)'
+  - task: CmdLine@2
+    inputs:
+      script: 'echo "$(config_file_path)"'
 
 
   # - task: TerraformTaskV4@4
