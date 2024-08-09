@@ -34,6 +34,10 @@ steps:
       backendAzureRmContainerName: 'azuredevopscontainer'
       backendAzureRmKey: 'terraform.tfstate'
 
+  - task: WhiteSource@21
+    inputs:
+      cwd: '$(System.DefaultWorkingDirectory)'
+ 
   - script: |
       /opt/hostedtoolcache/terraform/1.7.0/x64/terraform plan -var-file=$(config_file_path) -detailed-exitcode
     displayName: 'Terraform plan'
